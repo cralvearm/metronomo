@@ -1,2 +1,2 @@
-# metr-nomo
+# metronomo
 metrónomo
