@@ -338,6 +338,8 @@ function savePack() {
 function loadPack(p) {
   steps = cloneSteps(p.steps);
   curIdx = 0;
+  audio.beat = 0;
+  audio.origin = audio.next;
   syncSettings();
   renderMain();
   renderSections();
