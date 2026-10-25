@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Metrónomo — secuenciador de tempos y poliritmos</title>
+  <meta name="description" content="Programa los tempos de una pieza, cambia de pulso con un clic y practica poliritmos configurables.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" href="app.css">
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("metronomo-theme"); } catch (e) {}
+      if (t !== "light" && t !== "dark") {
+        t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <p class="kicker">Secuenciador de tempos y poliritmos</p>
+        <h1>Metrónomo</h1>
+      </div>
+      <div class="hbtns">
+        <button id="themeBtn" class="ghost sm" title="Cambiar tema"></button>
+        <button id="playBtn" class="primary sm" disabled></button>
+      </div>
+    </header>
+
+    <section class="card" id="mainCard" aria-label="Pulso actual"></section>
+
+    <div class="cols">
+      <section class="span2" aria-label="Secciones">
+        <div class="colhead">
+          <h2>Secciones</h2>
+          <button id="addStepBtn" class="ghost xs">+ Sección</button>
+        </div>
+        <div id="sections"></div>
+      </section>
+      <section aria-label="Piezas">
+        <h2>Piezas</h2>
+        <div class="card savecard">
+          <div class="saverow">
+            <input id="packName" class="in" placeholder="Nombre de la pieza">
+            <button id="savePackBtn" class="primary xs">Guardar</button>
+          </div>
+          <p class="fine">Guarda los pulsos y ritmos de esta pieza. Si el nombre ya existe, la sobrescribe. Las piezas se guardan en este navegador.</p>
+        </div>
+        <div id="packs"></div>
+        <button id="ioBtn" class="ghost block">Exportar / importar (JSON)</button>
+        <div id="ioPanel" class="iopanel" hidden>
+          <textarea id="ioText" rows="6" placeholder='Pega aquí una pieza {"name": "...", "steps": [...]} o una lista exportada, y pulsa Importar.'></textarea>
+          <div class="iorow">
+            <button id="ioImport" class="primary">Importar</button>
+            <button id="ioClose" class="ghost sm">Cerrar</button>
+          </div>
+          <p id="ioMsg" class="fine"></p>
+        </div>
+      </section>
+    </div>
+
+    <footer>Espacio o → : cambio de pulso · ← : pulso anterior · Enter: iniciar o pausar · 1–9: ir directo a esa sección · El recorrido es cíclico: del último pulso se vuelve al primero · Las polirritmias se activan o desactivan con un clic en su ficha</footer>
+  </div>
+  <script src="app.js" defer></script>
+</body>
+</html>
