@@ -1,7 +1,7 @@
 "use strict";
 
-const CACHE = "metronomo-v2";
-const ASSETS = ["./", "./index.html", "./app.css", "./app.js", "./manifest.webmanifest"];
+const CACHE = "metronomo-v3";
+const ASSETS = ["./", "./index.html", "./app.css", "./app.js", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
