@@ -132,6 +132,7 @@ const audio = {
   settings: { bpm: 90, meter: 4, subs: [] },
   timer: null,
   timers: new Set(),
+  wakeLock: null,
 };
 
 function ensureCtx() {
@@ -144,6 +145,22 @@ function ensureCtx() {
     audio.master.connect(audio.ctx.destination);
   }
   return audio.ctx;
+}
+
+/* ---------- Pantalla encendida mientras suena (Screen Wake Lock) ---------- */
+async function requestWakeLock() {
+  if (!("wakeLock" in navigator)) return;
+  try {
+    audio.wakeLock = await navigator.wakeLock.request("screen");
+    audio.wakeLock.addEventListener("release", () => { audio.wakeLock = null; });
+  } catch (e) {}
+}
+
+function releaseWakeLock() {
+  if (audio.wakeLock) {
+    audio.wakeLock.release().catch(() => {});
+    audio.wakeLock = null;
+  }
 }
 
 function synth(time, freq, v, dur, accent) {
@@ -227,6 +244,7 @@ function startPlayback() {
   const ctx = ensureCtx();
   if (!ctx) return;
   ctx.resume();
+  requestWakeLock();
   audio.next = ctx.currentTime + 0.08;
   audio.beat = 0;
   audio.origin = audio.next;
@@ -248,6 +266,7 @@ function stopPlayback() {
   if (audio.timer) { window.clearInterval(audio.timer); audio.timer = null; }
   audio.timers.forEach((id) => window.clearTimeout(id));
   audio.timers.clear();
+  releaseWakeLock();
   document.querySelectorAll(".dot.hit").forEach((el) => el.classList.remove("hit"));
   try { if (audio.ctx) audio.ctx.suspend(); } catch (e) {}
   renderPlayBtn();
@@ -432,19 +451,13 @@ function renderMain() {
     + '<span class="bpmlabel">BPM</span></div>'
     + '<div class="viz"><div class="dotrow" id="beatRow">' + beatDots.join("") + "</div>" + viz + "</div>"
     + '<div class="jump">' + jump + "</div>"
+    + '<div class="adrow">'
     + '<button class="advance" id="advanceBtn"' + (steps.length ? "" : " disabled") + '>Cambio de pulso</button>'
-    + '<div class="backrow"><button id="backBtn" class="ghost">Pulso anterior</button></div>'
-    + '<div class="volrow">'
-    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>'
-    + '<input id="volInput" type="range" min="0" max="1" step="0.05" value="' + vol + '" aria-label="Volumen general">'
+    + '<button id="backBtn" class="ghost backbtn" title="Pulso anterior (←)">←</button>'
     + "</div>";
 
   el.querySelector("#advanceBtn").addEventListener("click", () => advance(1));
   el.querySelector("#backBtn").addEventListener("click", () => advance(-1));
-  el.querySelector("#volInput").addEventListener("input", (e) => {
-    vol = Number(e.target.value);
-    if (audio.master) audio.master.gain.value = vol;
-  });
   el.querySelectorAll(".tick").forEach((b) => b.addEventListener("click", () => {
     const d = Number(b.dataset.d);
     const s = steps[curIdx];
@@ -606,6 +619,14 @@ function init() {
   $("#ioImport").addEventListener("click", importIO);
   $("#ioClose").addEventListener("click", () => { $("#ioPanel").hidden = true; });
   $("#playBtn").addEventListener("click", () => (playing ? stopPlayback() : startPlayback()));
+  $("#volInput").addEventListener("input", (e) => {
+    vol = Number(e.target.value);
+    if (audio.master) audio.master.gain.value = vol;
+  });
+  document.addEventListener("visibilitychange", () => {
+    // El wake lock se libera al ocultar la página; se vuelve a pedir al regresar
+    if (document.visibilityState === "visible" && playing) requestWakeLock();
+  });
   $("#themeBtn").addEventListener("click", toggleTheme);
   initSectionsEvents();
   initKeys();
@@ -624,3 +645,4 @@ function init() {
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
 else init();
+
