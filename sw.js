@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE = "metronomo-v4";
+const CACHE = "metronomo-v5";
 const ASSETS = ["./", "./index.html", "./app.css", "./app.js", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (e) => {
@@ -21,19 +21,22 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
+  const url = new URL(e.request.url);
+  if (url.origin !== self.location.origin) return;
+  // Network-first: la app se actualiza sola en la siguiente carga;
+  // sin conexión cae a la caché (y la navegación, a index.html)
   e.respondWith(
-    caches.match(e.request).then((hit) => {
-      if (hit) return hit;
-      return fetch(e.request).then((resp) => {
-        try {
-          if (resp.ok && new URL(e.request.url).origin === self.location.origin) {
-            const copy = resp.clone();
-            caches.open(CACHE).then((c) => c.put(e.request, copy));
-          }
-        } catch (err) {}
+    fetch(e.request)
+      .then((resp) => {
+        if (resp.ok) {
+          const copy = resp.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy));
+        }
         return resp;
-      }).catch(() => caches.match("./index.html"));
-    })
+      })
+      .catch(() =>
+        caches.match(e.request).then((hit) => hit || caches.match("./index.html"))
+      )
   );
 });
 
