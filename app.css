@@ -183,10 +183,6 @@ select.in { font-size: .875rem; padding: .375rem .25rem; }
 .iorow { display: flex; gap: .5rem; }
 .iorow .primary { flex: 1; padding: .375rem .75rem; font-size: .75rem; font-weight: 500; border-radius: .375rem; }
 
-footer { padding-bottom: .5rem; text-align: center; font-size: .6875rem; color: var(--ink-soft); }
-footer details { display: inline-block; }
-footer summary { cursor: pointer; }
-footer details p { margin: .5rem 0 0; }
 .empty { padding: 2.5rem 0; text-align: center; color: var(--ink-soft); }
 
 @media (prefers-reduced-motion: reduce) {
