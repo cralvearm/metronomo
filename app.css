@@ -131,9 +131,6 @@ h2 { margin: 0 0 .5rem; font-size: .875rem; font-weight: 500; letter-spacing: .0
 .dragh:hover { color: var(--ink); }
 .dragh:active { cursor: grabbing; }
 .secrow { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
-.navdot { width: .625rem; height: .625rem; border-radius: 50%; background: var(--g4); flex: none; }
-.navdot:hover { background: var(--g2); }
-.navdot.on { background: var(--ink); }
 .in { background: var(--bg); border: 1px solid var(--rule); border-radius: .375rem; padding: .375rem .5rem; outline: none; }
 .in:focus { border-color: var(--ink); }
 .name { flex: 1; min-width: 8rem; font-size: .875rem; }

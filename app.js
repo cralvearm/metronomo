@@ -492,7 +492,6 @@ function renderSections() {
     ).join("");
     return '<div class="seccard' + (i === curIdx ? " cur" : "") + '" data-i="' + i + '">'
       + '<div class="secrow">'
-      + '<button class="navdot' + (i === curIdx ? " on" : "") + '" data-go="1" title="Ir a esta sección"></button>'
       + '<button class="dragh" title="Arrastrar para reordenar">⠿</button>'
       + '<input class="in name" data-k="name" value="' + esc(s.name) + '" placeholder="Nombre">'
       + '<label class="numlab">BPM <input class="in num wBpm" data-k="bpm" type="number" min="20" max="300" value="' + s.bpm + '"></label>'
@@ -554,8 +553,7 @@ function initSectionsEvents() {
     const i = Number(card.dataset.i);
     const row = t.closest(".subrow");
     const bi = row ? Number(row.dataset.bi) : -1;
-    if (t.hasAttribute("data-go")) jumpTo(i);
-    else if (t.hasAttribute("data-mv")) moveStep(i, Number(t.dataset.mv));
+    if (t.hasAttribute("data-mv")) moveStep(i, Number(t.dataset.mv));
     else if (t.hasAttribute("data-del")) delStep(i);
     else if (t.hasAttribute("data-tgl")) {
       steps[i].subs[bi].on = !steps[i].subs[bi].on;
