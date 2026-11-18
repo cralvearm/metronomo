@@ -453,9 +453,7 @@ function renderMain() {
   });
 
   el.innerHTML =
-    '<div class="mhead">'
-    + '<div class="mtitle"><span class="secname">' + esc(cur.name || "Sin nombre") + "</span></div>"
-    + '<div class="chips">' + chips + "</div></div>"
+    '<div class="chips">' + chips + "</div>"
     + '<div class="viz"><div class="dotrow" id="beatRow">' + beatDots.join("") + "</div>" + viz + "</div>"
     + '<div class="jump">' + jump + "</div>"
     + '<div class="adrow">'
