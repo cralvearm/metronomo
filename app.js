@@ -323,6 +323,18 @@ function moveStep(i, dir) {
   renderSections();
 }
 
+function reorderSteps(from, to) {
+  if (from === to || from < 0 || to < 0 || from >= steps.length || to >= steps.length) return;
+  const moved = steps.splice(from, 1)[0];
+  steps.splice(to, 0, moved);
+  if (curIdx === from) curIdx = to;
+  else if (from < curIdx && to >= curIdx) curIdx -= 1;
+  else if (from > curIdx && to <= curIdx) curIdx += 1;
+  syncSettings();
+  renderMain();
+  renderSections();
+}
+
 function addSub(i) {
   steps[i].subs.push(mkSub());
   syncSettings();
@@ -442,13 +454,12 @@ function renderMain() {
 
   el.innerHTML =
     '<div class="mhead">'
-    + '<div class="mtitle"><span class="kicker">Sección ' + (curIdx + 1) + "/" + steps.length + '</span><span class="secname">' + esc(cur.name || "Sin nombre") + "</span></div>"
-    + '<div class="chips"><span class="chip">' + meter + " tiempos/compás</span>" + chips + "</div></div>"
+    + '<div class="mtitle"><span class="secname">' + esc(cur.name || "Sin nombre") + "</span></div>"
+    + '<div class="chips">' + chips + "</div></div>"
     + '<div class="bpmrow">'
     + '<button class="tick" data-d="-1" title="Bajar 1 BPM">−</button>'
     + '<span class="bpmnum">' + cur.bpm + '</span>'
-    + '<button class="tick" data-d="1" title="Subir 1 BPM">+</button>'
-    + '<span class="bpmlabel">BPM</span></div>'
+    + '<button class="tick" data-d="1" title="Subir 1 BPM">+</button></div>'
     + '<div class="viz"><div class="dotrow" id="beatRow">' + beatDots.join("") + "</div>" + viz + "</div>"
     + '<div class="jump">' + jump + "</div>"
     + '<div class="adrow">'
@@ -494,6 +505,7 @@ function renderSections() {
     return '<div class="seccard' + (i === curIdx ? " cur" : "") + '" data-i="' + i + '">'
       + '<div class="secrow">'
       + '<button class="navdot' + (i === curIdx ? " on" : "") + '" data-go="1" title="Ir a esta sección"></button>'
+      + '<button class="dragh" title="Arrastrar para reordenar">⠿</button>'
       + '<input class="in name" data-k="name" value="' + esc(s.name) + '" placeholder="Nombre">'
       + '<label class="numlab">BPM <input class="in num wBpm" data-k="bpm" type="number" min="20" max="300" value="' + s.bpm + '"></label>'
       + '<label class="numlab">Compás <select class="in" data-k="meter">' + METER_OPTS.map((m) => '<option value="' + m + '"' + (m === s.meter ? " selected" : "") + ">" + m + "</option>").join("") + "</select></label>"
@@ -594,6 +606,44 @@ function initSectionsEvents() {
   };
   host.addEventListener("input", onEdit);
   host.addEventListener("change", onEdit);
+
+  /* Reordenar secciones arrastrando el asa ⠿ (pointer events: mouse y táctil) */
+  let drag = null;
+  host.addEventListener("pointerdown", (e) => {
+    const h = e.target.closest(".dragh");
+    if (!h) return;
+    const card = h.closest(".seccard");
+    if (!card) return;
+    drag = { from: Number(card.dataset.i), card: card, startX: e.clientX, startY: e.clientY, moved: false, over: null };
+    e.preventDefault();
+  });
+  window.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    if (!drag.moved && Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) > 6) {
+      drag.moved = true;
+      drag.card.classList.add("dragging");
+      drag.card.style.pointerEvents = "none";
+    }
+    if (drag.moved) {
+      drag.card.style.transform = "translateY(" + (e.clientY - drag.startY) + "px)";
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const over = el && el.closest ? el.closest(".seccard") : null;
+      drag.over = over ? Number(over.dataset.i) : null;
+      host.querySelectorAll(".seccard").forEach((c) => c.classList.toggle("dragover", c === over));
+    }
+  });
+  const endDrag = (commit) => {
+    if (!drag) return;
+    const d = drag;
+    drag = null;
+    d.card.classList.remove("dragging");
+    d.card.style.transform = "";
+    d.card.style.pointerEvents = "";
+    host.querySelectorAll(".seccard").forEach((c) => c.classList.remove("dragover"));
+    if (commit && d.moved && d.over != null) reorderSteps(d.from, d.over);
+  };
+  window.addEventListener("pointerup", () => endDrag(true));
+  window.addEventListener("pointercancel", () => endDrag(false));
 }
 
 /* ---------- Atajos de teclado ---------- */

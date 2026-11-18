@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE = "metronomo-v5";
+const CACHE = "metronomo-v6";
 const ASSETS = ["./", "./index.html", "./app.css", "./app.js", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (e) => {
