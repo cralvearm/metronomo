@@ -454,6 +454,10 @@ function renderMain() {
 
   el.innerHTML =
     '<div class="chips">' + chips + "</div>"
+    + '<div class="bpmrow">'
+    + '<button class="tick" data-d="-1" title="Bajar 1 BPM">−</button>'
+    + '<span class="bpmnum">' + cur.bpm + '</span>'
+    + '<button class="tick" data-d="1" title="Subir 1 BPM">+</button></div>'
     + '<div class="viz"><div class="dotrow" id="beatRow">' + beatDots.join("") + "</div>" + viz + "</div>"
     + '<div class="jump">' + jump + "</div>"
     + '<div class="adrow">'
@@ -463,6 +467,14 @@ function renderMain() {
 
   el.querySelector("#advanceBtn").addEventListener("click", () => advance(1));
   el.querySelector("#backBtn").addEventListener("click", () => advance(-1));
+  el.querySelectorAll(".tick").forEach((b) => b.addEventListener("click", () => {
+    const d = Number(b.dataset.d);
+    const s = steps[curIdx];
+    s.bpm = clamp(s.bpm + d, 20, 300);
+    syncSettings();
+    renderMain();
+    renderSections();
+  }));
   el.querySelectorAll(".chip[data-si]").forEach((b) => b.addEventListener("click", () => {
     const sb = steps[curIdx].subs[Number(b.dataset.si)];
     sb.on = !sb.on;
