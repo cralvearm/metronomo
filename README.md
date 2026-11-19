@@ -11,7 +11,7 @@ Secuenciador de tempos y poliritmos para practicar piezas con cambios de pulso.
 
 ## Atajos de teclado
 
-Espacio o → : cambio de pulso · ← : pulso anterior · Enter: iniciar o pausar · 1–9: ir directo a esa sección
+Espacio o Enter : iniciar o pausar · → : cambio de pulso · ← : pulso anterior · 1–9: ir directo a esa sección
 
 ## Desarrollo
 

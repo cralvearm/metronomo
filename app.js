@@ -647,9 +647,9 @@ function initKeys() {
   window.addEventListener("keydown", (e) => {
     const tag = e.target && e.target.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-    if (e.code === "Space" || e.code === "ArrowRight") { e.preventDefault(); advance(1); }
+    if (e.code === "Space" || e.code === "Enter") { e.preventDefault(); playing ? stopPlayback() : startPlayback(); }
+    else if (e.code === "ArrowRight") { e.preventDefault(); advance(1); }
     else if (e.code === "ArrowLeft") { e.preventDefault(); advance(-1); }
-    else if (e.code === "Enter") { e.preventDefault(); playing ? stopPlayback() : startPlayback(); }
     else if (/^Digit[1-9]$/.test(e.code) || /^Numpad[1-9]$/.test(e.code)) {
       e.preventDefault();
       jumpTo(Number(e.code.slice(-1)) - 1);
