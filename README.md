@@ -15,6 +15,4 @@ Espacio o Enter : iniciar o pausar · → : cambio de pulso · ← : pulso anter
 
 ## Desarrollo
 
-Sin herramientas de compilación: `index.html`, `app.js`, `app.css`, `sw.js` y `manifest.webmanifest`. Publicado en GitHub Pages.
-
-Los iconos `icon-192.png`, `icon-512.png` y `icon-512-maskable.png` se agregan aparte en la raíz del repositorio.
+Sin herramientas de compilación: `index.html`, `app.js`, `app.css`, `sw.js` y `manifest.webmanifest`. Publicado en GitHub Pages. Los iconos PNG (`icon-192.png`, `icon-512.png`, `icon-512-maskable.png`) van en la raíz del repositorio.
